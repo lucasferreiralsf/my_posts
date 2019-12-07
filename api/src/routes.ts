@@ -1,13 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
-// import { UserController } from "./user/user.controller";
+
 import { loginValidator } from "./app/auth/validators/login.validator";
 import { AuthController } from "./app/auth/auth.controller";
 import { registerValidator } from "./app/auth/validators/register.validator";
-// import { updateUserValidator } from "./user/validators/update.validator";
-// import { BookController } from "./book/book.controller";
-// import { createBookValidator } from "./book/validators/create.validator";
-// import { updateBookValidator } from "./book/validators/update.validator";
+import { PostController } from "./app/post/post.controller";
+import { createPostValidator } from "./app/post/validators/create.validator";
+import { updatePostValidator } from "./app/post/validators/update.validator";
 
 function validate(req: Request, res: Response, next: NextFunction) {
   const errors = validationResult(req);
@@ -35,87 +34,62 @@ const authRoutes = [
     validate: validate,
     controller: AuthController,
     action: "register"
-  }
+  },
+  {
+    method: "delete",
+    route: "/auth",
+    auth: true,
+    controller: AuthController,
+    action: "delete"
+  },
 ];
 
-// const userRoutes = [
-//   {
-//     method: "get",
-//     route: "/user",
-//     controller: UserController,
-//     action: "all"
-//   },
-//   {
-//     method: "get",
-//     route: "/user/:id",
-//     auth: true,
-//     controller: UserController,
-//     action: "one"
-//   },
-//   {
-//     method: "put",
-//     route: "/user/:id",
-//     auth: true,
-//     criteria: updateUserValidator,
-//     validate: validate,
-//     controller: UserController,
-//     action: "update"
-//   },
-//   {
-//     method: "post",
-//     route: "/user/favorite/:id",
-//     auth: true,
-//     controller: UserController,
-//     action: "favoriteBook"
-//   },
-//   {
-//     method: "delete",
-//     route: "/user/:id",
-//     auth: true,
-//     controller: UserController,
-//     action: "deleteAccount"
-//   }
-// ];
-
-// const bookRoutes = [
-//   {
-//     method: "get",
-//     route: "/book",
-//     controller: BookController,
-//     action: "all"
-//   },
-//   {
-//     method: "get",
-//     route: "/book/:id",
-//     controller: BookController,
-//     action: "one"
-//   },
-//   {
-//     method: "post",
-//     route: "/book",
-//     auth: true,
-//     criteria: createBookValidator,
-//     validate: validate,
-//     controller: BookController,
-//     action: "create"
-//   },
-//   {
-//     method: "put",
-//     route: "/book/:id",
-//     auth: true,
-//     criteria: updateBookValidator,
-//     validate: validate,
-//     controller: BookController,
-//     action: "update"
-//   },
-//   {
-//     method: "delete",
-//     route: "/book/:id",
-//     auth: true,
-//     controller: BookController,
-//     action: "delete"
-//   }
-// ];
+const postRoutes = [
+  {
+    method: "get",
+    route: "/post",
+    controller: PostController,
+    action: "all"
+  },
+  {
+    method: "get",
+    route: "/post/:id",
+    controller: PostController,
+    action: "one"
+  },
+  {
+    method: "post",
+    route: "/post",
+    auth: true,
+    criteria: createPostValidator,
+    validate: validate,
+    controller: PostController,
+    action: "create"
+  },
+  {
+    method: "put",
+    route: "/post/:id",
+    auth: true,
+    criteria: updatePostValidator,
+    validate: validate,
+    controller: PostController,
+    action: "update"
+  },
+  {
+    method: "post",
+    route: "/post/upvote/:id",
+    auth: true,
+    controller: PostController,
+    action: "upVote"
+  },
+  {
+    method: "delete",
+    route: "/post/:id",
+    auth: true,
+    controller: PostController,
+    action: "delete"
+  }
+];
 
 export const Routes: {
   method: string;
@@ -125,4 +99,4 @@ export const Routes: {
   auth?: boolean;
   criteria?: any;
   validate?: any;
-}[] = [...authRoutes];
+}[] = [...authRoutes, ...postRoutes];

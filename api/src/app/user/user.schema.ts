@@ -1,8 +1,8 @@
 import { Schema, Document, model } from "mongoose";
 import * as bcrypt from "bcrypt";
 import mongoosePaginate from "mongoose-paginate-v2";
+import postSchema from "../post/post.schema";
 
-// import bookSchema, { IBook } from '../book/book.schema';
 
 type CustomMethods = {
   comparePassword: Function;
@@ -38,13 +38,20 @@ const User = new Schema<IUser & CustomMethods>(
       type: String,
       required: true
     },
-
-    favoriteBooks: [
+    
+    posts: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Book"
+        ref: "Post"
       }
-    ]
+    ],
+
+    favoritePosts: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Post"
+      }
+    ],
   },
   { timestamps: true, toJSON: { virtuals: true } }
 );
@@ -57,16 +64,14 @@ User.pre("save", function(this: any, next) {
   next();
 });
 
-// User.pre("remove", function(next) {
-//   bookSchema
-//     .update(
-//       { usersFavorites: this._id },
-//       { $pull: { usersFavorites: this._id } },
-//       { multi: true }
-//     ) //if reference exists in multiple documents
-//     .exec();
-//   next();
-// });
+User.pre("remove", function(next) {
+  postSchema
+    .deleteMany(
+      { owner: this._id }
+    ) //if reference exists in multiple documents
+    .exec();
+  next();
+});
 
 User.methods.comparePassword = function(plaintext: string, callback: any) {
   return bcrypt.compare(plaintext, this.password);

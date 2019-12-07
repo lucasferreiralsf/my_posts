@@ -17,6 +17,19 @@ export class AuthController {
     }
   }
 
+  async delete(
+    request: Request & { user: IUser },
+    response: Response,
+    next: NextFunction
+  ) {
+    const user: IUser = await User.findOneAndDelete({ _id: request.user._id });
+    if (!user) {
+      next(new HttpError("Email or password invalid.", 401));
+    } else {
+      response.status(200).json({});
+    }
+  }
+
   async login(request: Request, response: Response, next: NextFunction) {
     // try {
     const user: IUser = await User.findOne({ email: request.body.email });
@@ -24,14 +37,13 @@ export class AuthController {
       response.status(404).json({});
     }
 
-    const { email, firstName, lastName, favoriteBooks } = user;
+    const { email, firstName, lastName } = user;
 
     if (await user.comparePassword(request.body.password)) {
       const token = jwt.sign({ email }, config.secretKey, { expiresIn: "2h" });
       response.status(200).json({
         firstName,
         lastName,
-        favoriteBooks,
         token
       });
     } else {

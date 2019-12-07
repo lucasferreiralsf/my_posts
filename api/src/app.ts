@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 
 import { errorHandler } from "./common/error-handler";
 import { Routes } from "./routes";
-// import passportStrategy from "./auth/auth.strategy";
+import passportStrategy from "./app/auth/auth.strategy";
 import configuration from "./config/config";
 
 class AppController {
@@ -57,7 +57,7 @@ class AppController {
       })
     );
     this.express.use(bodyParser.json());
-    // passportStrategy(passport);
+    passportStrategy(passport);
     this.express.use(passport.initialize());
     this.express.use(errorHandler);
   }
