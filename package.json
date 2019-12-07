@@ -1,0 +1,8 @@
+{
+  "name": "my_posts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/lucasferreiralsf/my_posts.git",
+  "author": "lucasferreiralsf <lucasferreiralsf@hotmail.com>",
+  "license": "MIT"
+}
