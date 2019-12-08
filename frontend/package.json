@@ -1,0 +1,31 @@
+{
+  "name": "my-posts-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.7.2",
+    "next": "9.1.4",
+    "react": "16.12.0",
+    "react-dom": "16.12.0",
+    "react-icons": "^3.8.0",
+    "typeface-roboto": "^0.0.75"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.7.5",
+    "@storybook/addon-actions": "^5.2.8",
+    "@storybook/addon-links": "^5.2.8",
+    "@storybook/addons": "^5.2.8",
+    "@storybook/react": "^5.2.8",
+    "@types/node": "^12.12.14",
+    "@types/react": "^16.9.15",
+    "babel-loader": "^8.0.6",
+    "typescript": "^3.7.3"
+  }
+}

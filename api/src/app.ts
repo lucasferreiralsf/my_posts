@@ -23,7 +23,7 @@ class AppController {
 
   databaseInit() {
     mongoose
-      .connect(configuration.databaseUrl, {
+      .connect(configuration.databaseUrl as string, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false
