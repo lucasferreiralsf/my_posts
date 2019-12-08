@@ -103,7 +103,6 @@ export class PostController {
       const userUpVote = post.upVotes.find(
         element => element.toString() === request.user._id.toString()
       );
-      console.log(post);
       if (userUpVote) {
         post = await Post.findOneAndUpdate(
           { _id: post._id },
@@ -146,7 +145,7 @@ export class PostController {
     let post: IPost = await Post.findOne({ _id: request.params.id });
 
     if (post) {
-      if (post.owner === request.user._id) {
+      if (post.owner.toString() === request.user._id.toString()) {
         post = await post.remove();
         response.status(200).json({});
       } else {

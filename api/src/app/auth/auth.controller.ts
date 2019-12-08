@@ -37,11 +37,12 @@ export class AuthController {
       response.status(404).json({});
     }
 
-    const { email, firstName, lastName } = user;
+    const { _id, email, firstName, lastName } = user;
 
     if (await user.comparePassword(request.body.password)) {
       const token = jwt.sign({ email }, config.secretKey, { expiresIn: "2h" });
       response.status(200).json({
+        _id,
         firstName,
         lastName,
         token

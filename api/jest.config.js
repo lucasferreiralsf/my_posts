@@ -6,7 +6,7 @@ module.exports = {
   // automock: false,
 
   // Stop running tests after `n` failures
-  bail: 1,
+  bail: 0,
 
   // Respect "browser" field in package.json when resolving modules
   // browser: false,
@@ -91,7 +91,7 @@ module.exports = {
   // notifyMode: "failure-change",
 
   // A preset that is used as a base for Jest's configuration
-  // preset: null,
+  preset: "@shelf/jest-mongodb",
 
   // Run tests from one or more projects
   // projects: null,
