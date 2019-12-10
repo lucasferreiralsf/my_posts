@@ -24,6 +24,7 @@ export interface SignInState {
   readonly data: SignInPayload;
   readonly loading: boolean;
   readonly error: boolean;
+  readonly auth: boolean;
 }
 
 

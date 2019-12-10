@@ -17,7 +17,6 @@ export function* postGetAll() {
     if (response.status !== 200) throw yield response.json();
     response = yield response.json();
     yield put(postGetAllSuccess(response));
-    login(response);
   } catch (error) {
     yield put(postGetAllFailure());
   }

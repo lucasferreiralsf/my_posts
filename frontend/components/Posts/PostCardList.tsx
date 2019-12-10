@@ -49,7 +49,7 @@ const PostCardList = ({ auth }: Props) => {
     const upTest = posts.data.docs.reduce((prev, current, index, array) => {
       return [...prev, ...current.upVotes];
     }, []);
-    console.log("uptest: ", upTest);
+    // console.log("uptest: ", upTest);
   }
 
   const getOwnerLiked = (upvotes: IPost["upVotes"]): boolean => {

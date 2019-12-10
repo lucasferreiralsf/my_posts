@@ -9,7 +9,8 @@ const signInInitialState: SignInState = {
     _id: ""
   },
   loading: false,
-  error: false
+  error: false,
+  auth: false,
 };
 
 const reducer: Reducer<SignInState> = (state = signInInitialState, action) => {
@@ -21,6 +22,7 @@ const reducer: Reducer<SignInState> = (state = signInInitialState, action) => {
         ...state,
         loading: false,
         error: false,
+        auth: true,
         data: action.payload.data
       };
     case AuthTypes.SIGNIN_FAILURE:
@@ -28,6 +30,7 @@ const reducer: Reducer<SignInState> = (state = signInInitialState, action) => {
         ...state,
         loading: false,
         error: true,
+        auth: false,
         data: {
           firstName: "",
           lastName: "",
@@ -40,6 +43,7 @@ const reducer: Reducer<SignInState> = (state = signInInitialState, action) => {
         ...state,
         loading: false,
         error: false,
+        auth: false,
         data: {
           firstName: "",
           lastName: "",
