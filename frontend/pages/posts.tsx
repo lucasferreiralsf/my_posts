@@ -1,7 +1,6 @@
-import React from "react";
 import Head from "next/head";
-import Landing from "../components/Landing/Landing";
 import PostCardList from "../components/Posts/PostCardList";
+import { withAuthSync } from "../utils/auth";
 
 const posts = {
   docs: [
@@ -28,18 +27,18 @@ const posts = {
     },
   ]
 }
-const Home = () => (
+const Posts = () => (
   <div>
     <Head>
-      <title>Home</title>
+      <title>Posts</title>
       <link rel="icon" href="/favicon.ico" />
     </Head>
     
       <div>
-        <PostCardList  />
+        <PostCardList  auth={false} />
       </div>
    
   </div>
 );
 
-export default Home;
+export default withAuthSync(Posts);

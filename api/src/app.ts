@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import passport from "passport";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
 
 import { errorHandler } from "./common/error-handler";
 import { Routes } from "./routes";
@@ -60,6 +61,7 @@ class AppController {
     passportStrategy(passport);
     this.express.use(passport.initialize());
     this.express.use(errorHandler);
+    this.express.use(cors({ origin: "*"}))
   }
 
   routes() {
