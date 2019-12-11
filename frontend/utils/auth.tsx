@@ -10,7 +10,7 @@ export const login = ({ token, ...userInfo }) => {
   cookie.set('userInfo', userInfo, { expires: 1 });
   // window.localStorage.setItem('token', token);
   // window.localStorage.setItem('userInfo', JSON.stringify(userInfo));
-  Router.push('/posts');
+  Router.push('/');
 };
 
 export const auth = ctx => {
@@ -25,16 +25,16 @@ export const auth = ctx => {
   }
 
   // We already checked for server. This should only happen on client.
-  if (!token) {
+  if (!token && typeof window !== "undefined") {
     Router.push('/');
   }
 
-  if (token !== undefined && token !== "undefined") {
-    ctx.store.dispatch({
-      type: AuthTypes.SIGNIN_SUCCESS,
-      payload: { data: { token, ...(userInfo as {}) } }
-    });
-  }
+  // if (token !== undefined && token !== "undefined") {
+  //   ctx.store.dispatch({
+  //     type: AuthTypes.SIGNIN_SUCCESS,
+  //     payload: { data: { token, ...(userInfo as {}) } }
+  //   });
+  // }
 
   return { token, userInfo };
 };

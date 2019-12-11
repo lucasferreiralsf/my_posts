@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Badge,
   Typography,
@@ -15,7 +15,12 @@ import {
 } from "@material-ui/core";
 import { IoMdHeartEmpty, IoMdHeart } from "react-icons/io";
 import Link from "next/link";
-import { IPost } from "../../store/ducks/post/types";
+import { IPost, LikePostState } from "../../store/ducks/post/types";
+import { useSelector, shallowEqual, useDispatch } from "react-redux";
+import { AppState } from "../../store/ducks/rootReducer";
+import { SignInState } from "../../store/ducks/auth/types";
+import { likePostRequest } from "../../store/ducks/post/actions";
+import { useSnackbar } from "notistack";
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -33,56 +38,101 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = {
-  usersLiked?: IPost["upVotes"];
-  owner: IPost["owner"];
-  ownerLiked: boolean;
-  content: string;
-  likeOnClick?: Function;
-  auth: boolean;
-
+  post: IPost;
 };
 
-const LikeButton = ({ likeCount, ownerLiked, likeOnClick, auth }) => {
+const LikeButton = ({
+  likeCount,
+  _id,
+  upVotes
+}: {
+  likeCount: number;
+  _id: string;
+  upVotes: IPost["upVotes"];
+}) => {
   const classes = useStyles({});
+  const dispatch = useDispatch();
+
+  const authState: SignInState = useSelector(
+    (state: AppState) => state.auth,
+    shallowEqual
+  );
+
+  const likeOnClick = _id => {
+    dispatch(likePostRequest({ _id, token: authState.data.token }));
+  };
+
+  const getOwnerLiked = (): boolean => {
+    if (upVotes.length > 0) {
+      const filter = upVotes.filter(el =>
+        el && authState.data ? el._id === authState.data._id : []
+      );
+      if (filter.length >= 1) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   return (
     <div>
-      {auth ? (
+      {authState.auth ? (
         likeCount ? (
           <Badge
             color="primary"
             badgeContent={likeCount}
             className={classes.badgeMargin}
           >
-            <Link href="/api/post-card/like">
-              <IconButton size="small" color="primary">
-                {ownerLiked ? <IoMdHeart /> : <IoMdHeartEmpty />}
-              </IconButton>
-            </Link>
+            <IconButton
+              size="small"
+              color="primary"
+              onClick={() => likeOnClick(_id)}
+            >
+              {getOwnerLiked() ? <IoMdHeart /> : <IoMdHeartEmpty />}
+            </IconButton>
           </Badge>
         ) : (
-          <Link href="/api/post-card/like">
-            <IconButton size="small" color="primary">
-              {ownerLiked ? <IoMdHeart /> : <IoMdHeartEmpty />}
-            </IconButton>
-          </Link>
+          <IconButton
+            size="small"
+            color="primary"
+            onClick={() => likeOnClick(_id)}
+          >
+            {getOwnerLiked() ? <IoMdHeart /> : <IoMdHeartEmpty />}
+          </IconButton>
         )
-      ) : likeCount && (
-        <Chip size="small" label={ ` ${likeCount} curtidas.` } />
+      ) : likeCount ? (
+        <Chip size="small" label={` ${likeCount} curtidas.`} />
+      ) : (
+        <Chip size="small" label="Entre para curtir esse post." />
       )}
     </div>
   );
 };
 
-const PostCard = ({
-  content,
-  usersLiked,
-  owner,
-  ownerLiked,
-  likeOnClick,
-  auth
-}: Props) => {
+const PostCard = (props: Props) => {
   const classes = useStyles({});
+  const [post, setPost]: [IPost, (post: IPost) => void] = useState(props.post);
+  const { enqueueSnackbar } = useSnackbar();
+
+  const likePostState: LikePostState = useSelector(
+    (state: AppState) => state.likePost,
+    shallowEqual
+  );
+
+  useEffect(() => {
+    if (likePostState.data && likePostState.data._id) {
+      setPost(likePostState.data);
+    }
+  }, [likePostState.data]);
+
+  useEffect(() => {
+    if (likePostState.error) {
+      enqueueSnackbar(likePostState.errorMessage.errorMessage, {
+        variant: "error",
+        preventDuplicate: true
+      })
+    }
+  }, [likePostState.error]);
 
   return (
     <Card className={classes.card}>
@@ -94,7 +144,7 @@ const PostCard = ({
         />
         <CardContent>
           <Typography variant="body2" color="textSecondary" component="p">
-            {content}
+            {post.content}
           </Typography>
         </CardContent>
       </CardActionArea>
@@ -102,10 +152,13 @@ const PostCard = ({
         <Box display="flex" className={classes.actions} alignItems="center">
           <Box flexGrow={1}>
             <LikeButton
-              likeCount={usersLiked && usersLiked.length > 0 ? usersLiked.length : 0}
-              ownerLiked={ownerLiked}
-              likeOnClick={likeOnClick}
-              auth={auth}
+              likeCount={
+                post.upVotes && post.upVotes.length > 0
+                  ? post.upVotes.length
+                  : 0
+              }
+              upVotes={post.upVotes}
+              _id={post._id}
             />
           </Box>
           <Box p={1}>
@@ -115,7 +168,7 @@ const PostCard = ({
               color="textSecondary"
               component="p"
             >
-              {owner.firstName + ' ' + owner.lastName}
+              {post.owner.firstName + " " + post.owner.lastName}
             </Typography>
           </Box>
         </Box>

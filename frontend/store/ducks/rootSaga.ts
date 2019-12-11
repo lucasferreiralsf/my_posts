@@ -4,7 +4,7 @@ import { signIn, signOut } from './auth/sagas';
 import { SignUpTypes } from './signup/types';
 import { signUp } from './signup/sagas';
 import { PostTypes } from './post/types';
-import { postGetAll } from './post/sagas';
+import { postGetAll, sendNewPost, likePost } from './post/sagas';
 
 export default function* rootSaga() {
     return yield all([
@@ -12,5 +12,7 @@ export default function* rootSaga() {
         takeLatest(AuthTypes.SIGNOUT_REQUEST, signOut),
         takeLatest(SignUpTypes.SIGNUP_REQUEST, signUp),
         takeLatest(PostTypes.POST_GET_ALL, postGetAll),
+        takeLatest(PostTypes.SEND_NEW_POST, sendNewPost),
+        takeLatest(PostTypes.LIKE_POST, likePost),
     ])
 }

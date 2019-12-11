@@ -10,6 +10,11 @@ const signInInitialState: SignInState = {
   },
   loading: false,
   error: false,
+  errorMessage: {
+    error: {},
+    errorMessage: "",
+    status: 0
+  },
   auth: false,
 };
 
@@ -30,6 +35,7 @@ const reducer: Reducer<SignInState> = (state = signInInitialState, action) => {
         ...state,
         loading: false,
         error: true,
+        errorMessage: action.payload.errorMessage,
         auth: false,
         data: {
           firstName: "",

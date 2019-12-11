@@ -1,3 +1,5 @@
+import { CustomError } from "../../../utils/customError";
+
 export const SIGNUP = 'SIGNUP';
 export const SIGNIN = 'SIGNIN';
 
@@ -24,6 +26,7 @@ export interface SignInState {
   readonly data: SignInPayload;
   readonly loading: boolean;
   readonly error: boolean;
+  readonly errorMessage?: CustomError;
   readonly auth: boolean;
 }
 

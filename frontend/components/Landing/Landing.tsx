@@ -4,10 +4,10 @@ import {
   Toolbar,
   Typography,
   Button,
-  makeStyles,
+  makeStyles
 } from "@material-ui/core";
 import Link from "next/link";
-import { useSelector, shallowEqual } from "react-redux";
+import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { useSnackbar } from "notistack";
 
 import { SignUpState } from "../../store/ducks/signup/types";
@@ -15,13 +15,11 @@ import { AppState } from "../../store/ducks/rootReducer";
 import Login from "../Login/Login";
 import { SignInState } from "../../store/ducks/auth/types";
 import Router from "next/router";
-
+import { signOutRequest } from "../../store/ducks/auth/actions";
 
 type Props = {
   buttonText: string;
 };
-
-
 
 const useStyles = makeStyles(theme => ({
   menuButton: {
@@ -29,48 +27,45 @@ const useStyles = makeStyles(theme => ({
   },
   title: {
     flexGrow: 1
-  },  
+  }
 }));
 
 const Landing = props => {
-  const { token, firstName, lastName, _id } = props.children.props;  
-  
+  const { token, firstName, lastName, _id } = props.children.props;
+  const dispatch = useDispatch();
+
   const classes = useStyles({});
   const { enqueueSnackbar } = useSnackbar();
-  const state: SignUpState = useSelector(
+  const signupState: SignUpState = useSelector(
     (state: AppState) => state.signup,
     shallowEqual
   );
-  const authState: SignInState = useSelector(
-    (state: AppState) => state.auth,
-    shallowEqual
-  );
+  const state: AppState = useSelector((state: AppState) => state, shallowEqual);
 
   useEffect(() => {
-    if (state.error) {
-      if (state.data.errors !== undefined) {
+    if (signupState.error) {
+      if (signupState.data.errors !== undefined) {
         enqueueSnackbar("Usuário já cadastrado!", { variant: "error" });
       }
     }
-    if (!state.error && state.data.email) {
+    if (!signupState.error && signupState.data.email) {
       enqueueSnackbar("Usuário criado com sucesso!", {
         variant: "success",
         preventDuplicate: true
       });
     }
-  }, [state]);
+  }, [signupState]);
 
-  Router.beforePopState(({ url, as, options }) => {
-    // I only want to allow these two routes!
-    if (as !== '/' && as !== '/other') {
-      // Have SSR render bad routes as a 404.
-      if(authState.)
-      window.location.href = as
-      return false
+  useEffect(() => {
+    if (state.auth.error) {
+      if (state.auth.errorMessage.status === 401) {
+        enqueueSnackbar(state.auth.errorMessage.errorMessage, {
+          variant: "error"
+        });
+        dispatch(signOutRequest());
+      }
     }
-  
-    return true
-  })
+  }, [state]);
 
   // useEffect(() => {
   //   if (auth.data && auth.data.token) {
@@ -79,8 +74,6 @@ const Landing = props => {
   //     setAuthState(false);
   //   }
   // }, [auth]);
-
-  
 
   if (token) {
     // console.log("USER: ", props)
@@ -116,7 +109,5 @@ const Landing = props => {
     </div>
   );
 };
-
-
 
 export default Landing;

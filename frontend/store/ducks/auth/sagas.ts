@@ -3,6 +3,7 @@ import fetch from "isomorphic-unfetch";
 
 import { signInSuccess, signInFailure, signOutRequest } from "./actions";
 import { login, logout } from "../../../utils/auth";
+import { CustomError } from "../../../utils/customError";
 
 const api = (url, options) => {
   return fetch(url, options);
@@ -18,12 +19,15 @@ export function* signIn(action) {
         password: action.payload.password
       })
     });
-    if (response.status !== 200) throw yield response.json();
-    response = yield response.json();
-    yield put(signInSuccess(response));
-    login(response);
+    if (response.status === 200 || response.status === 201) {
+      response = yield response.json();
+      yield put(signInSuccess(response));
+      login(response);
+    } else {
+      throw new CustomError(response);
+    }
   } catch (error) {
-    yield put(signInFailure());
+    yield put(signInFailure(error));
   }
 }
 

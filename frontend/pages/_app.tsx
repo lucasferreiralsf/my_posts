@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import App from "next/app";
 import Head from "next/head";
 import { Provider } from "react-redux";
@@ -14,6 +14,9 @@ import { MY_POSTS_THEME } from "../components/Theme/Theme";
 import initStore from "../store";
 import Landing from "../components/Landing/Landing";
 import { AppState } from "../store/ducks/rootReducer";
+import Router from "next/router";
+import { auth } from "../utils/auth";
+import { AuthTypes } from "../store/ducks/auth/types";
 
 interface Props {
   store: Store<AppState>;
@@ -23,6 +26,15 @@ class MyApp extends App<Props & WithSnackbarProps> {
   componentDidMount() {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector("#jss-server-side");
+    const { token, userInfo } = auth(this.props);
+
+    if (token !== "undefined" && token !== undefined) {
+      this.props.store.dispatch({
+        type: AuthTypes.SIGNIN_SUCCESS,
+        payload: { data: { token, ...(userInfo as {}) } }
+      });
+    }
+
     if (jssStyles) {
       jssStyles.parentNode.removeChild(jssStyles);
     }
