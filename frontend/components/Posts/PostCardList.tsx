@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   makeStyles,
   Grid,
@@ -6,34 +6,36 @@ import {
   Button,
   Fab,
   CircularProgress
-} from "@material-ui/core";
-import PostCard from "./PostCard";
-import EmptyIcon from "../CustomIcons/EmptyIcon";
-import { PaginatedResponse } from "../../utils/paginatedResponse";
-import { useSelector, shallowEqual, useDispatch } from "react-redux";
+} from '@material-ui/core';
+import PostCard from './PostCard';
+import EmptyIcon from '../CustomIcons/EmptyIcon';
+import { PaginatedResponse } from '../../utils/paginatedResponse';
+import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 import {
   PostsState,
   PostTypes,
   IPost,
   IPostContent,
-  SendNewPostState,
-  LikePostState
-} from "../../store/ducks/post/types";
-import { AppState } from "../../store/ducks/rootReducer";
-import { SignInState } from "../../store/ducks/auth/types";
-import TextField from "../TextField";
-import { MdEdit } from "react-icons/md";
-import useForm from "react-hook-form";
-import { useSnackbar } from "notistack";
+  PostState
+} from '../../store/ducks/post/types';
+import { AppState } from '../../store/ducks/rootReducer';
+import { SignInState } from '../../store/ducks/auth/types';
+import TextField from '../TextField';
+import { MdEdit } from 'react-icons/md';
+import useForm from 'react-hook-form';
+import { useSnackbar } from 'notistack';
 import {
   postGetAllRequest,
-  likePostRequest
-} from "../../store/ducks/post/actions";
+  likePostRequest,
+  editPostRequest,
+  deletePostRequest,
+  sendNewPostRequest
+} from '../../store/ducks/post/actions';
 
 const useStyles = makeStyles(theme => ({
   root: {
     // flexGrow: 1,
-    width: "100%",
+    width: '100%',
     padding: theme.spacing(4)
   },
   media: {
@@ -43,19 +45,22 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(2)
   },
   gridContainer: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center"
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   formContainer: {
     marginBottom: theme.spacing(4)
   },
   buttonCadastrar: {},
+  buttonCancelar: {
+    marginRight: theme.spacing(2)
+  },
   loadMoreContainer: {
     marginTop: theme.spacing(6)
   },
   progress: {
-    color: "white"
+    color: 'white'
   }
 }));
 
@@ -68,12 +73,13 @@ const PostCardList = ({ auth }: Props) => {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const [page, setPage] = useState(2);
+  const [submitAction, setSubmitAction] = useState({ action: null, _id: null });
 
   const posts: PostsState = useSelector(
     (state: AppState) => state.posts,
     shallowEqual
   );
-  const sendNewPostState: SendNewPostState = useSelector(
+  const postState: PostState = useSelector(
     (state: AppState) => state.post,
     shallowEqual
   );
@@ -82,40 +88,87 @@ const PostCardList = ({ auth }: Props) => {
     (state: AppState) => state.auth,
     shallowEqual
   );
-  const { register, handleSubmit, errors, getValues } = useForm<IPostContent>({
-    mode: "onChange"
+  const { register, handleSubmit, errors, getValues, setValue } = useForm<
+    IPostContent
+  >({
+    mode: 'onChange'
   });
 
-  
-
   useEffect(() => {
-    if (sendNewPostState.data && sendNewPostState.data._id) {
+    if (postState.data && postState.data._id) {
+      if (postState.actionType === PostTypes.SEND_NEW_POST_SUCCESS) {
+        setValue('content', '');
+        dispatch(postGetAllRequest());
+        enqueueSnackbar('Post criado com sucesso!', {
+          variant: 'success',
+          preventDuplicate: true
+        });
+      }
+      if (postState.actionType === PostTypes.EDIT_POST_SUCCESS) {
+        setValue('content', '');
+        dispatch(postGetAllRequest());
+        enqueueSnackbar('Post editado com sucesso!', {
+          variant: 'success',
+          preventDuplicate: true
+        });
+      }
+    }
+    if (postState.actionType === PostTypes.DELETE_POST_SUCCESS) {
+      setValue('content', '');
       dispatch(postGetAllRequest());
-      enqueueSnackbar("Post criado com sucesso!", {
-        variant: "success",
+      enqueueSnackbar('Post deletado com sucesso!', {
+        variant: 'success',
         preventDuplicate: true
       });
     }
-  }, [sendNewPostState.data]);
+  }, [postState.data]);
 
   useEffect(() => {
-    if (sendNewPostState.error) {
-      enqueueSnackbar(sendNewPostState.errorMessage.errorMessage, {
-        variant: "error",
+    if (postState.error) {
+      enqueueSnackbar(postState.errorMessage.errorMessage, {
+        variant: 'error',
         preventDuplicate: true
       });
     }
-  }, [sendNewPostState.error]);
+  }, [postState.error]);
 
   useEffect(() => {
     dispatch(postGetAllRequest());
   }, []);
 
+  useEffect(() => {}, [posts.data]);
+
   const onSubmit = data => {
-    dispatch({
-      type: PostTypes.SEND_NEW_POST,
-      payload: { data, token: authState.data.token }
-    });
+    if (submitAction.action === 'EDIT') {
+      dispatch(
+        editPostRequest({
+          _id: submitAction._id,
+          token: authState.data.token,
+          data
+        })
+      );
+    } else {
+      dispatch(sendNewPostRequest({ data, token: authState.data.token }));
+    }
+  };
+
+  const handleEdit = (content: string, _id) => {
+    setSubmitAction({ action: 'EDIT', _id });
+    setValue('content', content);
+  };
+
+  const handleCancelEdit = () => {
+    setSubmitAction({ action: null, _id: null });
+    setValue('content', '');
+  };
+
+  const handleDelete = _id => {
+    dispatch(
+      deletePostRequest({
+        _id,
+        token: authState.data.token
+      })
+    );
   };
 
   const carregarMais = () => {
@@ -163,11 +216,23 @@ const PostCardList = ({ auth }: Props) => {
                           : false
                     }}
                     inputRef={register({
-                      required: "Este campo é obrigatório."
+                      required: 'Este campo é obrigatório.'
                     })}
                   />
                 </Grid>
                 <Grid item xs={4}>
+                  {submitAction.action === 'EDIT' && (
+                    <Button
+                      variant="outlined"
+                      color="default"
+                      type="button"
+                      size="small"
+                      className={classes.buttonCancelar}
+                      onClick={handleCancelEdit}
+                    >
+                      Cancelar
+                    </Button>
+                  )}
                   <Button
                     variant="contained"
                     color="primary"
@@ -175,12 +240,12 @@ const PostCardList = ({ auth }: Props) => {
                     size="small"
                     className={classes.buttonCadastrar}
                     disabled={
-                      errors.content !== undefined || getValues().content === ""
+                      errors.content !== undefined || getValues().content === ''
                         ? true
                         : false
                     }
                   >
-                    Cadastrar
+                    {submitAction.action === 'EDIT' ? 'Salvar' : 'Cadastrar'}
                   </Button>
                 </Grid>
               </Grid>
@@ -195,6 +260,8 @@ const PostCardList = ({ auth }: Props) => {
               <Grid item xs={3} key={post._id}>
                 <PostCard
                   post={post}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
                 />
               </Grid>
             ))}

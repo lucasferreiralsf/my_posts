@@ -12,7 +12,7 @@ import {
 import Link from 'next/link';
 import useForm from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   MdLock,
   MdVisibility,
@@ -24,6 +24,7 @@ import {
 import TextField from '../TextField';
 import { AppState } from '../../store/ducks/rootReducer';
 import { SignInState, AuthTypes } from '../../store/ducks/auth/types';
+import { useSnackbar } from 'notistack';
 
 type LoginForm = {
   email: string;
@@ -65,6 +66,7 @@ const Login = () => {
     showPassword: false
   });
 
+  const { enqueueSnackbar } = useSnackbar();
   const classes = useStyles({});
   const dispatch = useDispatch();
   const { register, handleSubmit, errors } = useForm<LoginForm>({
@@ -75,6 +77,14 @@ const Login = () => {
   const open = Boolean(anchorEl);
   const menuOpen = Boolean(anchorMenuEl);
   const id = open ? 'simple-popover' : undefined;
+
+  useEffect(() => {
+    if (auth.error) {
+      if (auth.errorMessage.status === 404) {
+        enqueueSnackbar('Email ou senha inválidos.', { variant: 'error', preventDuplicate: true });
+      }
+    }
+  }, [auth]);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

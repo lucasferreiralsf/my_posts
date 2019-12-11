@@ -11,11 +11,19 @@ export class CustomError {
   errorMessage: string;
   error?: any;
 
-  constructor(response: Response) {
+  constructor(response: Response, message?: string) {
     switch (response.status) {
       case 401:
         this.status = response.status;
         this.errorMessage = "Sua sessão expirou, entre novamente.";
+        response.json().then(res => {
+          this.error = res;
+        });
+        logout();
+        break;
+      case 404:
+        this.status = response.status;
+        this.errorMessage = "Registro não encontrado.";
         response.json().then(res => {
           this.error = res;
         });

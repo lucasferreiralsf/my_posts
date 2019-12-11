@@ -7,7 +7,11 @@ import {
   sendNewPostSuccess,
   sendNewPostFailure,
   likePostSuccess,
-  likePostFailure
+  likePostFailure,
+  editPostSuccess,
+  editPostFailure,
+  deletePostSuccess,
+  deletePostFailure
 } from "./actions";
 import { CustomError } from "../../../utils/customError";
 import { signInFailure } from "../auth/actions";
@@ -64,6 +68,57 @@ export function* sendNewPost(action) {
       yield put(signInFailure(error));
     } else {
       yield put(sendNewPostFailure(error));
+    }
+  }
+}
+
+export function* editPost(action) {
+  try {
+    let response = yield call(api, `${process.env.BACKEND_URL}/post/${action.payload._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${action.payload.token}`
+      },
+      body: JSON.stringify({
+        content: action.payload.data.content
+      })
+    });
+    if (response.status === 200 || response.status === 201) {
+      response = yield response.json();
+      yield put(editPostSuccess(response));
+    } else {
+      throw new CustomError(response);
+    }
+  } catch (error) {
+    if (error.status === 401) {
+      yield put(signInFailure(error));
+    } else {
+      yield put(editPostFailure(error));
+    }
+  }
+}
+
+export function* deletePost(action) {
+  try {
+    let response = yield call(api, `${process.env.BACKEND_URL}/post/${action.payload._id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${action.payload.token}`
+      },
+    });
+    if (response.status === 200 || response.status === 201) {
+      response = yield response.json();
+      yield put(deletePostSuccess(response));
+    } else {
+      throw new CustomError(response);
+    }
+  } catch (error) {
+    if (error.status === 401) {
+      yield put(signInFailure(error));
+    } else {
+      yield put(deletePostFailure(error));
     }
   }
 }

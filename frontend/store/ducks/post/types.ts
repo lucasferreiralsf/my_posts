@@ -12,8 +12,12 @@ export enum PostTypes {
   LIKE_POST = "LIKE_POST",
   LIKE_POST_SUCCESS = "LIKE_POST_SUCCESS",
   LIKE_POST_FAILURE = "LIKE_POST_FAILURE",
-  POST_PUT = "POST_PUT",
-  POST_DELETE = "POST_DELETE"
+  EDIT_POST = "EDIT_POST",
+  EDIT_POST_SUCCESS = "EDIT_POST_SUCCESS",
+  EDIT_POST_FAILURE = "EDIT_POST_FAILURE",
+  DELETE_POST = "DELETE_POST",
+  DELETE_POST_SUCCESS = "DELETE_POST_SUCCESS",
+  DELETE_POST_FAILURE = "DELETE_POST_FAILURE",
 }
 
 export interface UpVotes {
@@ -52,6 +56,9 @@ export type PostGetAllPayload = PaginatedResponse<IPost>;
 
 export interface PostState {
   readonly data: IPost;
+  readonly _id?: string;
+  readonly token?: string;
+  readonly actionType: PostTypes;
   readonly loading: boolean;
   readonly error: boolean;
   readonly errorMessage?: CustomError;
@@ -66,20 +73,3 @@ export interface PostsState {
   readonly errorMessage?: CustomError;
 }
 
-export interface SendNewPostState {
-  readonly data: IPost;
-  readonly token: string;
-  readonly loading: boolean;
-  readonly error: boolean;
-  readonly errorMessage?: CustomError;
-}
-
-
-export interface LikePostState {
-  readonly data: IPost;
-  readonly _id: string;
-  readonly token: string;
-  readonly loading: boolean;
-  readonly error: boolean;
-  readonly errorMessage?: CustomError;
-}

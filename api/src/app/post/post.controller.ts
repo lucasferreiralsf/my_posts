@@ -28,7 +28,7 @@ export class PostController {
   }
 
   async one(
-    request: Request & { user: IPost },
+    request: Request & { user: IUser },
     response: Response,
     next: NextFunction
   ) {
@@ -67,7 +67,7 @@ export class PostController {
   }
 
   async update(
-    request: Request & { user: IPost },
+    request: Request & { user: IUser },
     response: Response,
     next: NextFunction
   ) {
@@ -93,7 +93,7 @@ export class PostController {
   }
 
   async upVote(
-    request: Request & { user: IPost },
+    request: Request & { user: IUser },
     response: Response,
     next: NextFunction
   ) {
@@ -138,7 +138,7 @@ export class PostController {
   }
 
   async delete(
-    request: Request & { user: IPost },
+    request: Request & { user: IUser },
     response: Response,
     next: NextFunction
   ) {
