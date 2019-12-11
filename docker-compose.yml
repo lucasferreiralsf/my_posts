@@ -1,0 +1,63 @@
+version: '3'
+services:
+  my_posts_api:
+    container_name: my_posts_api
+    build: ./api
+    depends_on: 
+      - mongo_my_posts_db
+    environment:
+      - SECRET_KEY=Lh@tuJs09mYu@g4
+      - DATABASE_URL=mongodb://root:root@mongo_my_posts_db:27017/my_posts?authSource=admin
+      - PORT=4000
+    restart: always
+    volumes:
+      # - './api:/my_posts/api'
+      - /my_posts/api/node_modules
+    # ports:
+    #   - '7001:4000'
+    networks:
+      - docker_my_posts
+
+  my_posts_frontend:
+    container_name: my_posts_frontend
+    build: ./frontend
+    depends_on: 
+      - my_posts_api
+    environment:
+      - NODE_ENV=production
+    restart: always
+    volumes:
+      # - './frontend:/opt/my_posts_frontend/frontend'
+      - /my_posts/frontend/node_modules
+    ports:
+      - '80:3000'
+    networks:
+      - docker_my_posts
+
+  mongo_express:
+    container_name: mongo_express
+    image: mongo-express
+    depends_on: 
+      - mongo_my_posts_db
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root
+
+  mongo_my_posts_db:
+    container_name: mongo_my_posts_db
+    image: "mongo:4.2.1"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    restart: always
+    ports:
+      - '27017'
+    networks:
+      - docker_my_posts
+
+networks:
+  docker_my_posts:
+    external: false
