@@ -61,7 +61,6 @@ const useStyles = makeStyles(theme => ({
 const Login = () => {
   const [anchorMenuEl, setAnchorMenuEl] = useState<null | HTMLElement>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [authState, setAuthState] = useState(null);
   const [userData, setUserData] = useState({
     showPassword: false
   });
@@ -81,8 +80,14 @@ const Login = () => {
   useEffect(() => {
     if (auth.error) {
       if (auth.errorMessage.status === 404) {
-        enqueueSnackbar('Email ou senha inválidos.', { variant: 'error', preventDuplicate: true });
+        enqueueSnackbar('Email ou senha inválidos.', {
+          variant: 'error',
+          preventDuplicate: true
+        });
       }
+    }
+    if (!auth.auth) {
+      setAnchorMenuEl(null);
     }
   }, [auth]);
 
