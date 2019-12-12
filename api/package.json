@@ -8,8 +8,8 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "dev": "NODE_ENV=development nodemon --watch \"src/\" --exec \"ts-node src/index.ts\" -e ts --ignore __tests__",
-    "build": "tsc",
-    "prod": "NODE_ENV=production && npm run build && node build/index.js",
+    "build": "tsc -p .",
+    "prod": "NODE_ENV=production && node dist/index.js",
     "test": "NODE_ENV=test jest --detectOpenHandles"
   },
   "dependencies": {
