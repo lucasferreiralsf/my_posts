@@ -69,4 +69,4 @@ class MyApp extends App<Props & WithSnackbarProps> {
   }
 }
 
-export default withRedux(initStore, { debug: true })(withReduxSaga(MyApp));
+export default withRedux(initStore, { debug: process.env.NODE_ENV !== "production" ? true : false })(withReduxSaga(MyApp));
